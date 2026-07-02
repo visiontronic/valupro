@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>ValuPro — Valuation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #0b0f1a;
+  --surf:    #111827;
+  --card:    #151d2e;
+  --bdr:     #1e2d45;
+  --bdr2:    #243550;
+  --gold:    #c9a84c;
+  --golddim: #8a6f2e;
+  --goldg:   rgba(201,168,76,.13);
+  --teal:    #2dd4bf;
+  --tealg:   rgba(45,212,191,.14);
+  --red:     #f87171;
+  --green:   #4ade80;
+  --amber:   #fbbf24;
+  --txt:     #e2e8f0;
+  --muted:   #64748b;
+  --muted2:  #94a3b8;
+  --r:       10px;
+  --hdr:     54px;
+  --tabbar:  52px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
+header{
+  position:sticky;top:0;z-index:200;
+  background:rgba(11,15,26,.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;height:var(--hdr);
+}
+.logo{font-family:'DM Serif Display',serif;font-size:20px;color:var(--gold);display:flex;align-items:center;gap:8px}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.save-badge{font-size:11px;color:var(--muted);background:var(--surf);border:1px solid var(--bdr);border-radius:20px;padding:3px 10px}
+
+/* ── TOP NAV (pages) ── */
+.top-nav{
+  position:sticky;top:var(--hdr);z-index:190;
+  background:var(--surf);border-bottom:1px solid var(--bdr);
+  display:flex;gap:0;overflow-x:auto;scrollbar-width:none;
+}
+.top-nav::-webkit-scrollbar{display:none}
+.top-nav-btn{
+  flex-shrink:0;background:none;border:none;color:var(--muted2);
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
+  padding:14px 18px;cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .18s;white-space:nowrap;
+}
+.top-nav-btn:hover{color:var(--txt)}
+.top-nav-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── METHOD TAB BAR ── */
+.method-bar-wrap{
+  position:sticky;top:calc(var(--hdr) + var(--tabbar));z-index:180;
+  background:var(--bg);border-bottom:1px solid var(--bdr);
+  padding:0 12px;
+}
+.method-bar{
+  display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
+  padding:10px 0;
+}
+.method-bar::-webkit-scrollbar{display:none}
+.mbar-btn{
+  flex-shrink:0;background:var(--card);border:1px solid var(--bdr);
+  color:var(--muted2);border-radius:8px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:500;
+  padding:7px 13px;transition:all .15s;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+}
+.mbar-btn .micon{font-size:13px}
+.mbar-btn:hover{color:var(--txt);border-color:var(--bdr2)}
+.mbar-btn.active{color:var(--gold);background:var(--goldg);border-color:var(--golddim)}
+
+/* ── PAGE LAYOUT ── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── CALC PAGE ── */
+.calc-layout{
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:0;
+  min-height:calc(100vh - var(--hdr) - var(--tabbar) - 52px);
+}
+@media(max-width:900px){
+  .calc-layout{grid-template-columns:1fr}
+  .right-col{display:none!important}
+}
+
+.main-col{padding:20px 16px;max-width:760px;width:100%}
+@media(min-width:901px){.main-col{padding:24px 28px}}
+
+/* ── CALC CARD ── */
+.calc-card{
+  background:var(--card);border:1px solid var(--bdr);
+  border-radius:var(--r);padding:20px;margin-bottom:0;
+}
+.method-panel{display:none}
+.method-panel.active{display:block}
+
+.badge{
+  display:inline-flex;align-items:center;
+  background:var(--goldg);border:1px solid var(--golddim);
+  color:var(--gold);font-size:10px;font-weight:700;
+  letter-spacing:1.2px;text-transform:uppercase;
+  padding:3px 9px;border-radius:4px;margin-bottom:8px;
+}
+.card-title{font-family:'DM Serif Display',serif;font-size:22px;line-height:1.15;margin-bottom:6px}
+.card-desc{font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:14px}
+.formula{
+  background:var(--bg);border:1px solid var(--bdr);
+  border-radius:8px;padding:8px 14px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal);
+  display:inline-block;margin-bottom:18px;word-break:break-all;
+}
+
+/* sub-tabs (Graham) */
+.subtabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.subtab{
+  background:none;border:1px solid var(--bdr);color:var(--muted2);
+  border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;
+  font-size:12px;padding:5px 12px;transition:all .15s;
+}
+.subtab.active{color:var(--gold);background:var(--goldg);border-color:var(--golddim)}
+
+/* ── INPUT GRID ── */
+.input-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:12px;margin-bottom:18px;
+}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:600;color:var(--muted2);letter-spacing:.3px}
+.field input,.field select{
+  background:var(--surf);border:1px solid var(--bdr2);
+  border-radius:8px;color:var(--txt);
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  padding:9px 11px;outline:none;transition:border-color .2s;width:100%;
+}
+.field input:focus,.field select:focus{border-color:var(--gold)}
+.field input::placeholder{color:var(--muted)}
+.field select option{background:var(--surf)}
+
+/* ── ACTIONS ── */
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-calc{
+  background:var(--gold);color:#0b0f1a;border:none;border-radius:8px;
+  cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;
+  padding:10px 22px;transition:all .2s;
+}
+.btn-calc:hover{filter:brightness(1.1)}
+.btn-calc:active{transform:scale(.97)}
+.btn-sec{
+  background:none;border:1px solid var(--bdr2);color:var(--muted2);
+  border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;
+  font-size:13px;padding:10px 14px;transition:all .2s;
+}
+.btn-sec:hover{border-color:var(--muted);color:var(--txt)}
+.btn-save{
+  background:var(--tealg);border:1px solid var(--teal);color:var(--teal);
+  border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;
+  font-size:13px;font-weight:600;padding:10px 14px;transition:all .2s;
+}
+.btn-save:hover{background:rgba(45,212,191,.25)}
+
+/* ── RESULT ── */
+.result-box{
+  display:none;margin-top:16px;
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:var(--r);padding:16px;
+}
+.result-box.show{display:block}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bdr)}
+.rrow:last-of-type{border-bottom:none}
+.rlabel{font-size:12px;color:var(--muted2)}
+.rval{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700}
+.rval.pos{color:var(--green)}.rval.neg{color:var(--red)}.rval.neu{color:var(--gold)}
+.verdict{margin-top:12px;padding:10px 13px;border-radius:8px;font-size:12px;font-weight:600;line-height:1.5}
+.vbuy{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:var(--green)}
+.vwait{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:var(--amber)}
+.vavoid{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:var(--red)}
+
+/* comparison */
+.cmp-box{
+  margin-top:16px;background:var(--goldg);border:1px solid var(--golddim);
+  border-radius:var(--r);padding:14px;display:none;
+}
+.cmp-box.show{display:block}
+.cmp-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.cmp-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
+.cmp-name{color:var(--muted2)}
+.cmp-val{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold)}
+.cmp-avg-row{
+  margin-top:10px;padding-top:10px;border-top:1px solid var(--golddim);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.cmp-avg-label{font-size:12px;font-weight:700;color:var(--gold)}
+.cmp-avg-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--gold)}
+
+/* ── RIGHT COL ── */
+.right-col{
+  border-left:1px solid var(--bdr);background:var(--surf);
+  padding:20px 16px;overflow-y:auto;
+  height:calc(100vh - var(--hdr) - var(--tabbar) - 52px);
+  position:sticky;top:calc(var(--hdr) + var(--tabbar) + 52px);
+}
+.rc-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.ticker-wrap{position:relative;margin-bottom:8px}
+.ticker-wrap input{
+  width:100%;background:var(--card);border:1px solid var(--bdr2);
+  border-radius:8px;color:var(--txt);font-family:'JetBrains Mono',monospace;
+  font-size:14px;font-weight:600;padding:10px 12px 10px 38px;
+  outline:none;transition:border-color .2s;text-transform:uppercase;
+}
+.ticker-wrap input:focus{border-color:var(--gold)}
+.ticker-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px}
+.btn-fetch{
+  width:100%;background:linear-gradient(135deg,var(--golddim),var(--gold));
+  border:none;border-radius:8px;cursor:pointer;color:#0b0f1a;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:700;
+  padding:10px;transition:filter .2s;
+}
+.btn-fetch:hover{filter:brightness(1.1)}
+.quote-hint{font-size:10px;color:var(--muted);text-align:center;margin-top:5px}
+.divider{height:1px;background:var(--bdr);margin:16px 0}
+.metric-item{
+  display:flex;justify-content:space-between;align-items:center;
+  background:var(--card);border:1px solid var(--bdr);
+  border-radius:7px;padding:8px 10px;margin-bottom:5px;
+}
+.mk{font-size:11px;color:var(--muted2)}
+.mv{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600}
+.mv.up{color:var(--green)}.mv.dn{color:var(--red)}
+.ref-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted2);padding:3px 0}
+.ref-row span:last-child{color:var(--txt)}
+
+/* ── HISTORY PAGE ── */
+.hist-header{padding:20px 16px 8px;display:flex;justify-content:space-between;align-items:center}
+.hist-header h2{font-family:'DM Serif Display',serif;font-size:22px}
+.hist-grid{
+  display:grid;padding:0 16px 24px;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;
+}
+@media(min-width:601px){.hist-grid{padding:0 24px 24px}}
+.hcard{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s}
+.hcard:hover{border-color:var(--golddim);transform:translateY(-2px)}
+.hcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.hcard-ticker{font-family:'DM Serif Display',serif;font-size:20px;color:var(--gold)}
+.hcard-method{font-size:11px;color:var(--muted);background:var(--surf);padding:3px 8px;border-radius:4px}
+.hcard-result{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:700;color:var(--teal)}
+.hcard-date{font-size:11px;color:var(--muted);margin-top:5px}
+.hcard-margin{font-size:12px;font-weight:600;margin-top:6px}
+.empty-state{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 20px}
+.empty-state .icon{font-size:44px;display:block;margin-bottom:10px}
+.btn-danger{background:none;border:1px solid var(--red);color:var(--red);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:12px;transition:all .2s}
+.btn-danger:hover{background:rgba(248,113,113,.1)}
+
+/* ── ABOUT PAGE ── */
+.about-wrap{padding:20px 16px 40px;max-width:860px;margin:0 auto}
+@media(min-width:601px){.about-wrap{padding:28px 28px 40px}}
+.about-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:18px}
+.about-card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:18px}
+.about-card .badge{margin-bottom:6px}
+.about-card h3{font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:8px}
+.about-card p{font-size:12px;color:var(--muted2);line-height:1.7}
+
+/* ── QUOTE MOBILE SHEET ── */
+.quote-mobile{
+  display:none;
+  background:var(--surf);border-top:1px solid var(--bdr);
+  padding:14px 16px;
+}
+@media(max-width:900px){.quote-mobile{display:block}}
+.qm-ticker-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.qm-ticker-row input{
+  flex:1;background:var(--card);border:1px solid var(--bdr2);
+  border-radius:8px;color:var(--txt);font-family:'JetBrains Mono',monospace;
+  font-size:14px;font-weight:600;padding:9px 12px;outline:none;
+  text-transform:uppercase;
+}
+.qm-ticker-row input:focus{border-color:var(--gold)}
+.qm-btn{
+  background:var(--gold);border:none;border-radius:8px;color:#0b0f1a;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:700;
+  padding:9px 16px;cursor:pointer;white-space:nowrap;flex-shrink:0;
+}
+.qm-metrics{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.qm-metrics::-webkit-scrollbar{display:none}
+.qm-chip{
+  flex-shrink:0;background:var(--card);border:1px solid var(--bdr);
+  border-radius:8px;padding:8px 12px;text-align:center;min-width:90px;
+}
+.qm-chip-label{font-size:10px;color:var(--muted);display:block;margin-bottom:3px}
+.qm-chip-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700}
+.qm-chip-val.up{color:var(--green)}.qm-chip-val.dn{color:var(--red)}.qm-chip-val.neu{color:var(--gold)}
+
+/* mult table */
+.mult-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+.mult-table th{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:5px 6px;text-align:left}
+.mult-table td{padding:7px 6px;border-top:1px solid var(--bdr)}
+.mult-table td:last-child{font-family:'JetBrains Mono',monospace;font-weight:700;text-align:right}
+.t-buy{color:var(--green)}.t-fair{color:var(--amber)}.t-over{color:var(--red)}
+
+@media(max-width:420px){
+  .input-grid{grid-template-columns:1fr 1fr}
+  .card-title{font-size:19px}
+  .actions{gap:6px}
+  .btn-calc{padding:10px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="logo"><div class="logo-dot"></div>ValuPro</div>
+  <div class="hdr-right">
+    <span class="save-badge" id="save-badge">0 análises</span>
+  </div>
+</header>
+
+<!-- ═══ TOP NAV ═══ -->
+<nav class="top-nav">
+  <button class="top-nav-btn active" onclick="showPage('calc',this)">📊 Calculadoras</button>
+  <button class="top-nav-btn" onclick="showPage('history',this)">📁 Histórico</button>
+  <button class="top-nav-btn" onclick="showPage('about',this)">📖 Métodos</button>
+</nav>
+
+<!-- ══════════════════════════════════════ -->
+<!-- PAGE: CALC                            -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-calc" class="page active">
+
+  <!-- QUOTE STRIP (mobile) -->
+  <div class="quote-mobile">
+    <div class="qm-ticker-row">
+      <input type="text" id="qm-ticker" placeholder="PETR4, VALE3..." maxlength="10" onkeyup="if(event.key==='Enter')fetchQuote('qm')"/>
+      <button class="qm-btn" id="qm-btn" onclick="fetchQuote('qm')">Buscar</button>
+    </div>
+    <div class="qm-metrics" id="qm-metrics" style="display:none"></div>
+  </div>
+
+  <!-- METHOD BAR -->
+  <div class="method-bar-wrap">
+    <div class="method-bar">
+      <button class="mbar-btn active" onclick="showMethod('bazin',this)"><span class="micon">B</span>Bazin</button>
+      <button class="mbar-btn" onclick="showMethod('graham',this)"><span class="micon">G</span>Graham</button>
+      <button class="mbar-btn" onclick="showMethod('lynch',this)"><span class="micon">L</span>Lynch</button>
+      <button class="mbar-btn" onclick="showMethod('gordon',this)"><span class="micon">⟳</span>Gordon</button>
+      <button class="mbar-btn" onclick="showMethod('dcf',this)"><span class="micon">⟆</span>DCF</button>
+      <button class="mbar-btn" onclick="showMethod('greenblatt',this)"><span class="micon">✦</span>Greenblatt</button>
+      <button class="mbar-btn" onclick="showMethod('netnets',this)"><span class="micon">NN</span>Net-Net</button>
+      <button class="mbar-btn" onclick="showMethod('multiples',this)"><span class="micon">M</span>Múltiplos</button>
+    </div>
+  </div>
+
+  <div class="calc-layout">
+    <div class="main-col">
+
+      <!-- ─── BAZIN ─── -->
+      <div id="method-bazin" class="method-panel active">
+        <div class="calc-card">
+          <div class="badge">Décio Bazin</div>
+          <div class="card-title">Preço Teto por Dividendos</div>
+          <div class="card-desc">Define o preço máximo a pagar para garantir um Dividend Yield mínimo. Conservador, focado em renda passiva. Clássico para bancos, utilities e FIIs.</div>
+          <div class="formula">Preço Teto = DPA ÷ DY_mínimo</div>
+          <div class="input-grid">
+            <div class="field"><label>Dividendos/Ação — 12m (R$)</label><input type="number" id="b-dpa" placeholder="ex: 4.50" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>Cotação Atual (R$)</label><input type="number" id="b-price" placeholder="ex: 62.00" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>DY Mínimo (%)</label><input type="number" id="b-dy" placeholder="6" value="6" step="0.1" inputmode="decimal"/></div>
+          </div>
+          <div class="actions">
+            <button class="btn-calc" onclick="calcBazin()">Calcular</button>
+            <button class="btn-sec" onclick="clearR('bazin')">Limpar</button>
+            <button class="btn-save" onclick="saveA('bazin')">💾 Salvar</button>
+          </div>
+          <div id="result-bazin" class="result-box">
+            <div class="rrow"><span class="rlabel">Preço Teto Bazin</span><span class="rval neu" id="rb-teto">—</span></div>
+            <div class="rrow"><span class="rlabel">DY Atual</span><span class="rval" id="rb-dy">—</span></div>
+            <div class="rrow"><span class="rlabel">Margem de Segurança</span><span class="rval" id="rb-ms">—</span></div>
+            <div class="verdict" id="rb-verd"></div>
+          </div>
+        </div>
+        <div id="cmp-bazin" class="cmp-box"></div>
+      </div>
+
+      <!-- ─── GRAHAM ─── -->
+      <div id="method-graham" class="method-panel">
+        <div class="calc-card">
+          <div class="badge">Benjamin Graham</div>
+          <div class="card-title">Valor Intrínseco</div>
+          <div class="card-desc">Fórmula clássica do pai do Value Investing. A variante BR adapta para a taxa livre de risco brasileira (SELIC/CDI).</div>
+          <div class="subtabs">
+            <button class="subtab active" onclick="switchSub('graham','original',this)">Fórmula Original</button>
+            <button class="subtab" onclick="switchSub('graham','br',this)">Adaptação BR</button>
+          </div>
+          <div id="graham-original">
+            <div class="formula">VI = √(22,5 × LPA × VPA)</div>
+            <div class="input-grid">
+              <div class="field"><label>LPA — Lucro/Ação (R$)</label><input type="number" id="g-lpa" placeholder="ex: 5.20" step="0.01" inputmode="decimal"/></div>
+              <div class="field"><label>VPA — Val. Patrimonial/Ação (R$)</label><input type="number" id="g-vpa" placeholder="ex: 32.00" step="0.01" inputmode="decimal"/></div>
+              <div class="field"><label>Cotação Atual (R$)</label><input type="number" id="g-price" placeholder="ex: 62.00" step="0.01" inputmode="decimal"/></div>
+            </div>
+          </div>
+          <div id="graham-br" style="display:none">
+            <div class="formula">VI = LPA × (8,5 + 2g) × (4,4 ÷ taxa_rf)</div>
+            <div class="input-grid">
+              <div class="field"><label>LPA (R$)</label><input type="number" id="gb-lpa" placeholder="ex: 5.20" step="0.01" inputmode="decimal"/></div>
+              <div class="field"><label>Crescimento Esperado (% a.a.)</label><input type="number" id="gb-g" placeholder="ex: 8" step="0.1" inputmode="decimal"/></div>
+              <div class="field"><label>Taxa Livre de Risco (% SELIC)</label><input type="number" id="gb-rf" placeholder="ex: 13.75" step="0.1" inputmode="decimal"/></div>
+              <div class="field"><label>Cotação Atual (R$)</label><input type="number" id="gb-price" placeholder="ex: 62.00" step="0.01" inputmode="decimal"/></div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn-calc" onclick="calcGraham()">Calcular</button>
+            <button class="btn-sec" onclick="clearR('graham')">Limpar</button>
+            <button class="btn-save" onclick="saveA('graham')">💾 Salvar</button>
+          </div>
+          <div id="result-graham" class="result-box">
+            <div class="rrow"><span class="rlabel">Valor Intrínseco</span><span class="rval neu" id="rg-vi">—</span></div>
+            <div class="rrow"><span class="rlabel">P/L Implícito</span><span class="rval" id="rg-pl">—</span></div>
+            <div class="rrow"><span class="rlabel">Margem de Segurança</span><span class="rval" id="rg-ms">—</span></div>
+            <div class="verdict" id="rg-verd"></div>
+          </div>
+        </div>
+        <div id="cmp-graham" class="cmp-box"></div>
+      </div>
+
+      <!-- ─── LYNCH ─── -->
+      <div id="method-lynch" class="method-panel">
+        <div class="calc-card">
+          <div class="badge">Peter Lynch</div>
+          <div class="card-title">PEG Ratio &amp; Fair Value</div>
+          <div class="card-desc">Popularizado em "One Up on Wall Street". PEG &lt; 1 indica subvalorização. Preço justo ocorre quando P/L = crescimento anual do lucro.</div>
+          <div class="formula">PEG = (P/L) ÷ g | Preço Justo = LPA × g</div>
+          <div class="input-grid">
+            <div class="field"><label>LPA (R$)</label><input type="number" id="pl-lpa" placeholder="ex: 5.20" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>P/L Atual</label><input type="number" id="pl-pl" placeholder="ex: 12" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>Crescimento do Lucro (% a.a.)</label><input type="number" id="pl-g" placeholder="ex: 15" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>Dividend Yield (%) — opcional</label><input type="number" id="pl-dy" placeholder="ex: 3.5" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>Cotação Atual (R$)</label><input type="number" id="pl-price" placeholder="ex: 62.00" step="0.01" inputmode="decimal"/></div>
+          </div>
+          <div class="actions">
+            <button class="btn-calc" onclick="calcLynch()">Calcular</button>
+            <button class="btn-sec" onclick="clearR('lynch')">Limpar</button>
+            <button class="btn-save" onclick="saveA('lynch')">💾 Salvar</button>
+          </div>
+          <div id="result-lynch" class="result-box">
+            <div class="rrow"><span class="rlabel">PEG Ratio</span><span class="rval neu" id="rl-peg">—</span></div>
+            <div class="rrow"><span class="rlabel">PEG Ajustado (c/ DY)</span><span class="rval" id="rl-peg2">—</span></div>
+            <div class="rrow"><span class="rlabel">Preço Justo (PEG = 1)</span><span class="rval neu" id="rl-fair">—</span></div>
+            <div class="rrow"><span class="rlabel">Margem de Segurança</span><span class="rval" id="rl-ms">—</span></div>
+            <div class="verdict" id="rl-verd"></div>
+          </div>
+        </div>
+        <div id="cmp-lynch" class="cmp-box"></div>
+      </div>
+
+      <!-- ─── GORDON ─── -->
+      <div id="method-gordon" class="method-panel">
+        <div class="calc-card">
+          <div class="badge">Myron Gordon</div>
+          <div class="card-title">Modelo DDM — Gordon Growth</div>
+          <div class="card-desc">Estima o valor presente de todos os dividendos futuros com crescimento perpétuo constante. Ideal para empresas maduras e previsíveis. A taxa ke deve ser maior que g.</div>
+          <div class="formula">P = D₁ ÷ (ke − g)</div>
+          <div class="input-grid">
+            <div class="field"><label>Dividendo Esperado Próx. 12m (R$)</label><input type="number" id="gd-d1" placeholder="ex: 5.00" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>Taxa de Retorno Exigida — ke (%)</label><input type="number" id="gd-ke" placeholder="ex: 12" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>Crescimento Perpétuo — g (%)</label><input type="number" id="gd-g" placeholder="ex: 4" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>Cotação Atual (R$)</label><input type="number" id="gd-price" placeholder="ex: 62.00" step="0.01" inputmode="decimal"/></div>
+          </div>
+          <div class="actions">
+            <button class="btn-calc" onclick="calcGordon()">Calcular</button>
+            <button class="btn-sec" onclick="clearR('gordon')">Limpar</button>
+            <button class="btn-save" onclick="saveA('gordon')">💾 Salvar</button>
+          </div>
+          <div id="result-gordon" class="result-box">
+            <div class="rrow"><span class="rlabel">Valor Intrínseco (DDM)</span><span class="rval neu" id="rgd-vi">—</span></div>
+            <div class="rrow"><span class="rlabel">Margem de Segurança</span><span class="rval" id="rgd-ms">—</span></div>
+            <div class="verdict" id="rgd-verd"></div>
+          </div>
+        </div>
+        <div id="cmp-gordon" class="cmp-box"></div>
+      </div>
+
+      <!-- ─── DCF ─── -->
+      <div id="method-dcf" class="method-panel">
+        <div class="calc-card">
+          <div class="badge">Discounted Cash Flow</div>
+          <div class="card-title">Fluxo de Caixa Descontado</div>
+          <div class="card-desc">Método em 2 fases preferido por Buffett e profissionais. Soma os FCFs futuros descontados + valor terminal. WACC deve ser realista (geralmente 10–14% no Brasil).</div>
+          <div class="formula">V = Σ FCF×(1+g₁)ⁿ/(1+r)ⁿ + TV/(1+r)ᴺ</div>
+          <div class="input-grid">
+            <div class="field"><label>FCF/Ação Atual (R$)</label><input type="number" id="dc-fcf" placeholder="ex: 6.00" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>Crescimento Fase 1 (% a.a.)</label><input type="number" id="dc-g1" placeholder="ex: 12" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>Anos na Fase 1</label><input type="number" id="dc-n" placeholder="10" value="10" step="1" inputmode="numeric"/></div>
+            <div class="field"><label>Crescimento Perpétuo Fase 2 (%)</label><input type="number" id="dc-g2" placeholder="ex: 4" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>Taxa de Desconto / WACC (%)</label><input type="number" id="dc-wacc" placeholder="ex: 12" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>Margem de Segurança (%)</label><input type="number" id="dc-ms" placeholder="25" value="25" step="1" inputmode="numeric"/></div>
+            <div class="field"><label>Cotação Atual (R$)</label><input type="number" id="dc-price" placeholder="ex: 62.00" step="0.01" inputmode="decimal"/></div>
+          </div>
+          <div class="actions">
+            <button class="btn-calc" onclick="calcDCF()">Calcular</button>
+            <button class="btn-sec" onclick="clearR('dcf')">Limpar</button>
+            <button class="btn-save" onclick="saveA('dcf')">💾 Salvar</button>
+          </div>
+          <div id="result-dcf" class="result-box">
+            <div class="rrow"><span class="rlabel">Valor Intrínseco (DCF)</span><span class="rval neu" id="rdc-vi">—</span></div>
+            <div class="rrow"><span class="rlabel">Valor Terminal (% do total)</span><span class="rval" id="rdc-tv">—</span></div>
+            <div class="rrow"><span class="rlabel">Preço Teto (c/ margem)</span><span class="rval neu" id="rdc-teto">—</span></div>
+            <div class="rrow"><span class="rlabel">Margem de Segurança Real</span><span class="rval" id="rdc-ms">—</span></div>
+            <div class="verdict" id="rdc-verd"></div>
+          </div>
+        </div>
+        <div id="cmp-dcf" class="cmp-box"></div>
+      </div>
+
+      <!-- ─── GREENBLATT ─── -->
+      <div id="method-greenblatt" class="method-panel">
+        <div class="calc-card">
+          <div class="badge">Joel Greenblatt</div>
+          <div class="card-title">Magic Formula</div>
+          <div class="card-desc">Do livro "The Little Book That Beats the Market". Combina Earnings Yield (empresa barata?) e Return on Capital (empresa boa?). Ideal para ranking de carteira.</div>
+          <div class="formula">EY = EBIT/EV | ROC = EBIT/(Ativos Fixos + Cap. Giro)</div>
+          <div class="input-grid">
+            <div class="field"><label>EBIT (R$ mi)</label><input type="number" id="gk-ebit" placeholder="ex: 500" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>Enterprise Value — EV (R$ mi)</label><input type="number" id="gk-ev" placeholder="ex: 4000" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>Ativos Fixos Líq. (R$ mi)</label><input type="number" id="gk-af" placeholder="ex: 800" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>Capital de Giro (R$ mi)</label><input type="number" id="gk-cg" placeholder="ex: 200" step="0.01" inputmode="decimal"/></div>
+          </div>
+          <div class="actions">
+            <button class="btn-calc" onclick="calcGreenblatt()">Calcular</button>
+            <button class="btn-sec" onclick="clearR('greenblatt')">Limpar</button>
+            <button class="btn-save" onclick="saveA('greenblatt')">💾 Salvar</button>
+          </div>
+          <div id="result-greenblatt" class="result-box">
+            <div class="rrow"><span class="rlabel">Earnings Yield (EY)</span><span class="rval neu" id="rgk-ey">—</span></div>
+            <div class="rrow"><span class="rlabel">Return on Capital (ROC)</span><span class="rval neu" id="rgk-roc">—</span></div>
+            <div class="rrow"><span class="rlabel">Score Magic Formula</span><span class="rval neu" id="rgk-score">—</span></div>
+            <div class="verdict" id="rgk-verd"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── NET-NET ─── -->
+      <div id="method-netnets" class="method-panel">
+        <div class="calc-card">
+          <div class="badge">Graham — Net-Net</div>
+          <div class="card-title">Valor de Liquidação (NCAV)</div>
+          <div class="card-desc">Net Current Asset Value: comprar abaixo do valor dos ativos circulantes menos todas as dívidas. O maior nível de margem de segurança possível no Value Investing.</div>
+          <div class="formula">NCAV/Ação = (Ativo Circulante − Passivo Total) ÷ nº Ações</div>
+          <div class="input-grid">
+            <div class="field"><label>Ativo Circulante Total (R$ mi)</label><input type="number" id="nn-ac" placeholder="ex: 500" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>Passivo Total (R$ mi)</label><input type="number" id="nn-pt" placeholder="ex: 300" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>Número de Ações (mi)</label><input type="number" id="nn-sh" placeholder="ex: 80" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>Cotação Atual (R$)</label><input type="number" id="nn-price" placeholder="ex: 62.00" step="0.01" inputmode="decimal"/></div>
+          </div>
+          <div class="actions">
+            <button class="btn-calc" onclick="calcNetNet()">Calcular</button>
+            <button class="btn-sec" onclick="clearR('netnets')">Limpar</button>
+            <button class="btn-save" onclick="saveA('netnets')">💾 Salvar</button>
+          </div>
+          <div id="result-netnets" class="result-box">
+            <div class="rrow"><span class="rlabel">NCAV por Ação</span><span class="rval neu" id="rnn-ncav">—</span></div>
+            <div class="rrow"><span class="rlabel">P/NCAV</span><span class="rval" id="rnn-ratio">—</span></div>
+            <div class="rrow"><span class="rlabel">Desconto sobre NCAV</span><span class="rval" id="rnn-disc">—</span></div>
+            <div class="verdict" id="rnn-verd"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── MÚLTIPLOS ─── -->
+      <div id="method-multiples" class="method-panel">
+        <div class="calc-card">
+          <div class="badge">Valuation Relativo</div>
+          <div class="card-title">Análise de Múltiplos</div>
+          <div class="card-desc">Compara P/L, P/VP, EV/EBITDA e P/FCF com benchmarks do setor. Calcula o preço justo implícito em cada múltiplo e tira uma média de consenso.</div>
+          <div class="input-grid">
+            <div class="field"><label>LPA (R$)</label><input type="number" id="mu-lpa" placeholder="ex: 5.20" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>VPA (R$)</label><input type="number" id="mu-vpa" placeholder="ex: 32.00" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>EBITDA/Ação (R$)</label><input type="number" id="mu-ebitda" placeholder="ex: 8.00" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>FCF/Ação (R$)</label><input type="number" id="mu-fcf" placeholder="ex: 6.00" step="0.01" inputmode="decimal"/></div>
+            <div class="field"><label>P/L Justo do Setor</label><input type="number" id="mu-pl-ref" placeholder="ex: 10" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>P/VP Justo do Setor</label><input type="number" id="mu-pvp-ref" placeholder="ex: 1.5" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>EV/EBITDA Justo do Setor</label><input type="number" id="mu-ev-ref" placeholder="ex: 7" step="0.1" inputmode="decimal"/></div>
+            <div class="field"><label>Cotação Atual (R$)</label><input type="number" id="mu-price" placeholder="ex: 62.00" step="0.01" inputmode="decimal"/></div>
+          </div>
+          <div class="actions">
+            <button class="btn-calc" onclick="calcMultiples()">Calcular</button>
+            <button class="btn-sec" onclick="clearR('multiples')">Limpar</button>
+            <button class="btn-save" onclick="saveA('multiples')">💾 Salvar</button>
+          </div>
+          <div id="result-multiples" class="result-box">
+            <table class="mult-table">
+              <thead><tr><th>Múltiplo</th><th>Atual</th><th>Ref.</th><th>Preço Justo</th><th>Status</th></tr></thead>
+              <tbody id="rmu-tbody"></tbody>
+            </table>
+            <div class="rrow" style="margin-top:12px"><span class="rlabel">Média de Consenso</span><span class="rval neu" id="rmu-avg">—</span></div>
+            <div class="verdict" id="rmu-verd"></div>
+          </div>
+        </div>
+        <div id="cmp-multiples" class="cmp-box"></div>
+      </div>
+
+    </div><!-- /main-col -->
+
+    <!-- RIGHT COL (desktop) -->
+    <div class="right-col">
+      <div class="rc-title">Buscar Cotação</div>
+      <div class="ticker-wrap">
+        <span class="ticker-icon">⊙</span>
+        <input type="text" id="rc-ticker" placeholder="PETR4, VALE3..." maxlength="10" onkeyup="if(event.key==='Enter')fetchQuote('rc')"/>
+      </div>
+      <button class="btn-fetch" id="rc-btn" onclick="fetchQuote('rc')">Buscar Cotação</button>
+      <div class="quote-hint">Yahoo Finance · dados em tempo real</div>
+
+      <div id="rc-quote" style="display:none">
+        <div class="divider"></div>
+        <div class="rc-title" id="rc-sym">—</div>
+        <div id="rc-metrics"></div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="rc-title">Comparativo</div>
+      <div id="rc-cmp" style="color:var(--muted);font-size:12px;text-align:center;padding:12px 0">Calcule 2+ métodos para comparar</div>
+
+      <div class="divider"></div>
+      <div class="rc-title">Referências do Setor</div>
+      <div class="ref-row"><span>Bancos P/L</span><span>6–12×</span></div>
+      <div class="ref-row"><span>Utilities P/L</span><span>10–18×</span></div>
+      <div class="ref-row"><span>Varejo P/L</span><span>15–25×</span></div>
+      <div class="ref-row"><span>SELIC est.</span><span style="color:var(--gold)">~13,25%</span></div>
+      <div class="ref-row"><span>DY mín. Bazin</span><span style="color:var(--gold)">6,0%</span></div>
+      <div class="ref-row"><span>Graham P/L×P/VP</span><span style="color:var(--gold)">≤ 22,5</span></div>
+      <div class="ref-row"><span>PEG atrativo</span><span style="color:var(--green)">&lt; 1,0</span></div>
+      <div class="ref-row"><span>EV/EBITDA geral</span><span>5–10×</span></div>
+    </div>
+  </div><!-- /calc-layout -->
+</div><!-- /page-calc -->
+
+<!-- ══════════════════════════════════════ -->
+<!-- PAGE: HISTORY                         -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-history" class="page">
+  <div class="hist-header">
+    <div>
+      <h2>Histórico</h2>
+      <p style="font-size:12px;color:var(--muted);margin-top:3px">Análises salvas localmente</p>
+    </div>
+    <button class="btn-danger" onclick="clearAll()">Limpar tudo</button>
+  </div>
+  <div class="hist-grid" id="hist-grid">
+    <div class="empty-state"><span class="icon">📊</span>Nenhuma análise salva ainda.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- PAGE: ABOUT                           -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-about" class="page">
+  <div class="about-wrap">
+    <h2 style="font-family:'DM Serif Display',serif;font-size:26px">Guia dos Métodos</h2>
+    <p style="font-size:13px;color:var(--muted);margin-top:4px">Quando e como usar cada método de valuation</p>
+    <div class="about-grid">
+      <div class="about-card"><div class="badge">Bazin</div><h3>Preço Teto por DY</h3><p>Ideal para pagadoras de dividendos regulares: bancos, utilities, FIIs. <strong style="color:var(--gold)">Ponto forte:</strong> simplicidade e foco em renda. <strong style="color:var(--red)">Limitação:</strong> ignora crescimento dos lucros.</p></div>
+      <div class="about-card"><div class="badge">Graham</div><h3>Valor Intrínseco</h3><p>Para empresas lucrativas com patrimônio sólido. A fórmula √(22,5×LPA×VPA) exige P/L≤15 e P/VP≤1,5. <strong style="color:var(--gold)">Ponto forte:</strong> considera ativos e lucros. <strong style="color:var(--red)">Limitação:</strong> não se aplica a alto crescimento.</p></div>
+      <div class="about-card"><div class="badge">Peter Lynch</div><h3>PEG Ratio</h3><p>Perfeito para empresas em crescimento. PEG &lt; 1 = subvalorizado; &lt; 0,5 = barganha. <strong style="color:var(--gold)">Ponto forte:</strong> incorpora crescimento. <strong style="color:var(--red)">Limitação:</strong> muito dependente da projeção de crescimento.</p></div>
+      <div class="about-card"><div class="badge">Gordon DDM</div><h3>Dividendos Futuros</h3><p>Perfeito para utilities e telecoms com dividendos previsíveis. g deve ser menor que ke. <strong style="color:var(--gold)">Ponto forte:</strong> baseado em geração de caixa real. <strong style="color:var(--red)">Limitação:</strong> muito sensível à diferença ke−g.</p></div>
+      <div class="about-card"><div class="badge">DCF</div><h3>Fluxo de Caixa Desc.</h3><p>O método mais completo. Favorito de Buffett e gestoras profissionais. <strong style="color:var(--gold)">Ponto forte:</strong> rigor econômico total. <strong style="color:var(--red)">Limitação:</strong> WACC e crescimento irrealistas distorcem o resultado.</p></div>
+      <div class="about-card"><div class="badge">Greenblatt</div><h3>Magic Formula</h3><p>Para screening de dezenas de papéis simultaneamente. <strong style="color:var(--gold)">Ponto forte:</strong> sistemático e objetivo. <strong style="color:var(--red)">Limitação:</strong> funciona melhor como filtro de lista, não análise isolada.</p></div>
+      <div class="about-card"><div class="badge">Net-Net</div><h3>Valor de Liquidação</h3><p>Deep value: empresas vendidas abaixo do caixa líquido. Raro no mercado BR. <strong style="color:var(--gold)">Ponto forte:</strong> margem de segurança máxima. <strong style="color:var(--red)">Limitação:</strong> empresas assim geralmente têm problemas sérios.</p></div>
+      <div class="about-card"><div class="badge">Múltiplos</div><h3>Valuation Relativo</h3><p>Compara com pares do setor ou histórico. <strong style="color:var(--gold)">Ponto forte:</strong> rápido e intuitivo. <strong style="color:var(--red)">Limitação:</strong> se o setor estiver caro, um papel "barato" pode ainda estar caro em termos absolutos.</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let analyses = JSON.parse(localStorage.getItem('vp_analyses')||'[]');
+let lastR = {};
+let grahamSub = 'original';
+let curMethod = 'bazin';
+
+// ══════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const num = id => parseFloat($(id)?.value) || 0;
+
+function fmtR(v, dec=2){
+  if(v===null||v===undefined||isNaN(v)) return '—';
+  return 'R$ '+v.toFixed(dec).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+function fmtP(v){ if(isNaN(v)||v===null) return '—'; return (v>=0?'+':'')+v.toFixed(1)+'%'; }
+function fmtX(v){ if(isNaN(v)||v===null) return '—'; return v.toFixed(2)+'×'; }
+function msCls(p){ return p>15?'pos':p>0?'neu':'neg'; }
+function verdict(p, method){
+  if(p>25) return {cls:'vbuy', txt:`✅ COMPRA — Margem de segurança de ${p.toFixed(0)}% abaixo do valor justo (${method}).`};
+  if(p>0)  return {cls:'vwait',txt:`⚠️ NEUTRO — ${p.toFixed(0)}% abaixo do preço justo. Aguarde maior desconto para entrar.`};
+  return     {cls:'vavoid',txt:`🔴 CARO — Negociada ${Math.abs(p).toFixed(0)}% ACIMA do valor calculado por ${method}.`};
+}
+function setResult(id, val, cls='neu'){ if($(id)){$(id).textContent=val;$(id).className='rval '+cls;} }
+function setVerdict(id, p, method){ const v=verdict(p,method); if($(id)){$(id).className='verdict '+v.cls; $(id).textContent=v.txt;} }
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function showPage(id, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.top-nav-btn').forEach(b=>b.classList.remove('active'));
+  $('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='history') renderHistory();
+}
+
+function showMethod(m, btn){
+  document.querySelectorAll('.method-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.mbar-btn').forEach(b=>b.classList.remove('active'));
+  $('method-'+m).classList.add('active');
+  btn.classList.add('active');
+  curMethod = m;
+}
+
+function switchSub(method, sub, btn){
+  if(method==='graham'){
+    grahamSub = sub;
+    $('graham-original').style.display = sub==='original'?'block':'none';
+    $('graham-br').style.display        = sub==='br'?'block':'none';
+  }
+  btn.closest('.subtabs').querySelectorAll('.subtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// CALCULATIONS
+// ══════════════════════════════════════════════════════
+
+// ─── BAZIN ───
+function calcBazin(){
+  const dpa=num('b-dpa'), price=num('b-price'), dyMin=(num('b-dy')||6)/100;
+  if(!dpa){alert('Informe o DPA.');return;}
+  const teto=dpa/dyMin;
+  const dyAtual=price?dpa/price*100:null;
+  const ms=price?(teto-price)/price*100:null;
+  setResult('rb-teto',fmtR(teto),'neu');
+  setResult('rb-dy', dyAtual!==null?dyAtual.toFixed(2)+'%':'—', dyAtual&&dyAtual>=(dyMin*100)?'pos':'neg');
+  if(ms!==null){ setResult('rb-ms',fmtP(ms),msCls(ms)); setVerdict('rb-verd',ms,'Bazin'); }
+  $('result-bazin').classList.add('show');
+  lastR.bazin={teto,label:'Bazin',price};
+  updateCmp();
+}
+
+// ─── GRAHAM ───
+function calcGraham(){
+  let vi,price,pl;
+  if(grahamSub==='original'){
+    const lpa=num('g-lpa'),vpa=num('g-vpa');
+    price=num('g-price');
+    if(!lpa||!vpa||lpa<=0||vpa<=0){alert('LPA e VPA devem ser positivos.');return;}
+    vi=Math.sqrt(22.5*lpa*vpa); pl=price?price/lpa:null;
+  } else {
+    const lpa=num('gb-lpa'),g=num('gb-g'),rf=num('gb-rf');
+    price=num('gb-price');
+    if(!lpa||!g||!rf){alert('Preencha todos os campos.');return;}
+    vi=lpa*(8.5+2*g)*(4.4/rf); pl=price?price/lpa:null;
+  }
+  const ms=price?(vi-price)/price*100:null;
+  setResult('rg-vi',fmtR(vi),'neu');
+  setResult('rg-pl',pl?fmtX(pl):'—',pl&&pl<15?'pos':pl&&pl<20?'neu':'neg');
+  if(ms!==null){ setResult('rg-ms',fmtP(ms),msCls(ms)); setVerdict('rg-verd',ms,'Graham'); }
+  $('result-graham').classList.add('show');
+  lastR.graham={teto:vi,label:'Graham',price};
+  updateCmp();
+}
+
+// ─── LYNCH ───
+function calcLynch(){
+  const lpa=num('pl-lpa'),pl=num('pl-pl'),g=num('pl-g'),dy=num('pl-dy'),price=num('pl-price');
+  if(!lpa||!pl||!g){alert('Preencha LPA, P/L e crescimento.');return;}
+  const peg=pl/g, peg2=dy?pl/(g+dy):null, fair=lpa*g;
+  const ms=price?(fair-price)/price*100:null;
+  setResult('rl-peg',fmtX(peg),peg<1?'pos':peg<2?'neu':'neg');
+  setResult('rl-peg2',peg2?fmtX(peg2):'— (DY não informado)','');
+  setResult('rl-fair',fmtR(fair),'neu');
+  if(ms!==null){ setResult('rl-ms',fmtP(ms),msCls(ms)); setVerdict('rl-verd',ms,'Lynch'); }
+  $('result-lynch').classList.add('show');
+  lastR.lynch={teto:fair,label:'Lynch',price};
+  updateCmp();
+}
+
+// ─── GORDON ───
+function calcGordon(){
+  const d1=num('gd-d1'),ke=num('gd-ke')/100,g=num('gd-g')/100,price=num('gd-price');
+  if(!d1||!ke){alert('Preencha todos os campos.');return;}
+  if(ke<=g){alert('A taxa ke deve ser maior que o crescimento g.');return;}
+  const vi=d1/(ke-g);
+  const ms=price?(vi-price)/price*100:null;
+  setResult('rgd-vi',fmtR(vi),'neu');
+  if(ms!==null){ setResult('rgd-ms',fmtP(ms),msCls(ms)); setVerdict('rgd-verd',ms,'Gordon'); }
+  $('result-gordon').classList.add('show');
+  lastR.gordon={teto:vi,label:'Gordon',price};
+  updateCmp();
+}
+
+// ─── DCF ───
+function calcDCF(){
+  const fcf0=num('dc-fcf'),g1=num('dc-g1')/100,n=parseInt($('dc-n').value)||10;
+  const g2=num('dc-g2')/100,wacc=num('dc-wacc')/100,msP=(num('dc-ms')||25)/100,price=num('dc-price');
+  if(!fcf0||!g1||!g2||!wacc){alert('Preencha todos os campos.');return;}
+  if(wacc<=g2){alert('WACC deve ser maior que o crescimento perpétuo.');return;}
+  let pv=0,fcf=fcf0;
+  for(let i=1;i<=n;i++){ fcf*=(1+g1); pv+=fcf/Math.pow(1+wacc,i); }
+  const tv=fcf*(1+g2)/(wacc-g2), pvTV=tv/Math.pow(1+wacc,n), total=pv+pvTV;
+  const teto=total*(1-msP), tvPct=pvTV/total*100;
+  const ms=price?(total-price)/price*100:null;
+  setResult('rdc-vi',fmtR(total),'neu');
+  setResult('rdc-tv',tvPct.toFixed(1)+'%','');
+  setResult('rdc-teto',fmtR(teto),'neu');
+  if(ms!==null){ setResult('rdc-ms',fmtP(ms),msCls(ms)); setVerdict('rdc-verd',ms,'DCF'); }
+  $('result-dcf').classList.add('show');
+  lastR.dcf={teto:total,label:'DCF',price};
+  updateCmp();
+}
+
+// ─── GREENBLATT ───
+function calcGreenblatt(){
+  const ebit=num('gk-ebit'),ev=num('gk-ev'),af=num('gk-af'),cg=num('gk-cg');
+  if(!ebit||!ev||!af||!cg){alert('Preencha todos os campos.');return;}
+  const ey=ebit/ev*100, roc=ebit/(af+cg)*100, score=ey+roc;
+  setResult('rgk-ey',ey.toFixed(2)+'%',ey>8?'pos':ey>4?'neu':'neg');
+  setResult('rgk-roc',roc.toFixed(2)+'%',roc>25?'pos':roc>12?'neu':'neg');
+  setResult('rgk-score',score.toFixed(2)+' pts',score>40?'pos':score>20?'neu':'neg');
+  const el=$('rgk-verd');
+  if(ey>8&&roc>25){el.className='verdict vbuy';el.textContent='✅ EXCELENTE — EY e ROC acima do benchmark. Empresa boa a preço barato (Magic Formula alta).';}
+  else if(ey>5&&roc>12){el.className='verdict vwait';el.textContent=`⚠️ RAZOÁVEL — Score de ${score.toFixed(0)} pts. Busque EY > 8% e ROC > 25% para pontuação ideal.`;}
+  else{el.className='verdict vavoid';el.textContent='🔴 FRACO — Magic Formula prefere EY > 8% E ROC > 25% simultaneamente.';}
+  $('result-greenblatt').classList.add('show');
+}
+
+// ─── NET-NET ───
+function calcNetNet(){
+  const ac=num('nn-ac'),pt=num('nn-pt'),sh=num('nn-sh'),price=num('nn-price');
+  if(!ac||!pt||!sh){alert('Preencha todos os campos.');return;}
+  const ncav=(ac-pt)/sh, ratio=price?price/ncav:null, disc=price?(ncav-price)/price*100:null;
+  setResult('rnn-ncav',fmtR(ncav),'neu');
+  setResult('rnn-ratio',ratio?fmtX(ratio):'—',ratio&&ratio<1?'pos':ratio&&ratio<1.5?'neu':'neg');
+  if(disc!==null){ setResult('rnn-disc',fmtP(disc),msCls(disc)); setVerdict('rnn-verd',disc,'Net-Net'); }
+  $('result-netnets').classList.add('show');
+}
+
+// ─── MÚLTIPLOS ───
+function calcMultiples(){
+  const lpa=num('mu-lpa'),vpa=num('mu-vpa'),ebitda=num('mu-ebitda'),fcf=num('mu-fcf');
+  const plR=num('mu-pl-ref'),pvpR=num('mu-pvp-ref'),evR=num('mu-ev-ref'),price=num('mu-price');
+  if(!price){alert('Informe a cotação atual.');return;}
+  const rows=[];
+  if(lpa&&plR){const fair=lpa*plR;rows.push({n:'P/L',cur:price/lpa,ref:plR,fair,pct:(fair-price)/price*100});}
+  if(vpa&&pvpR){const fair=vpa*pvpR;rows.push({n:'P/VP',cur:price/vpa,ref:pvpR,fair,pct:(fair-price)/price*100});}
+  if(ebitda&&evR){const fair=ebitda*evR;rows.push({n:'EV/EBITDA',cur:price/ebitda,ref:evR,fair,pct:(fair-price)/price*100});}
+  if(fcf){const fair=fcf*15;rows.push({n:'P/FCF',cur:price/fcf,ref:'12–20×',fair,pct:(fair-price)/price*100});}
+  if(!rows.length){alert('Preencha ao menos um múltiplo.');return;}
+  $('rmu-tbody').innerHTML=rows.map(r=>{
+    const cls=r.pct>15?'t-buy':r.pct>-10?'t-fair':'t-over';
+    const tag=r.pct>15?'Barato':r.pct>-10?'Justo':'Caro';
+    const refStr=typeof r.ref==='number'?fmtX(r.ref):r.ref;
+    return `<tr><td>${r.n}</td><td>${fmtX(r.cur)}</td><td>${refStr}</td><td>${fmtR(r.fair)}</td><td class="${cls}">${tag}</td></tr>`;
+  }).join('');
+  const avg=rows.reduce((s,r)=>s+r.fair,0)/rows.length;
+  setResult('rmu-avg',fmtR(avg),'neu');
+  const ms=(avg-price)/price*100;
+  setVerdict('rmu-verd',ms,'Múltiplos');
+  $('result-multiples').classList.add('show');
+  lastR.multiples={teto:avg,label:'Múltiplos',price};
+  updateCmp();
+}
+
+// ─── CLEAR ───
+function clearR(id){ $('result-'+id).classList.remove('show'); }
+
+// ══════════════════════════════════════════════════════
+// COMPARISON PANEL (desktop right col)
+// ══════════════════════════════════════════════════════
+function updateCmp(){
+  const keys=Object.keys(lastR).filter(k=>lastR[k]&&lastR[k].teto);
+  const el=$('rc-cmp');
+  if(keys.length<2){ el.innerHTML='<span style="color:var(--muted);font-size:12px">Calcule 2+ métodos para comparar</span>'; return; }
+  const rows=keys.map(k=>{
+    const r=lastR[k], ms=r.price?(r.teto-r.price)/r.price*100:null;
+    const msHtml=ms!==null?`<span style="color:${ms>0?'var(--green)':'var(--red)'};font-size:11px">${fmtP(ms)}</span>`:'';
+    return `<div class="cmp-row"><span class="cmp-name">${r.label}</span><div style="display:flex;gap:8px;align-items:center">${msHtml}<span class="cmp-val">${fmtR(r.teto)}</span></div></div>`;
+  }).join('');
+  const avg=keys.reduce((s,k)=>s+lastR[k].teto,0)/keys.length;
+  el.innerHTML=`${rows}<div class="cmp-avg-row"><span class="cmp-avg-label">Consenso</span><span class="cmp-avg-val">${fmtR(avg)}</span></div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// SAVE / HISTORY
+// ══════════════════════════════════════════════════════
+function saveA(method){
+  const r=lastR[method];
+  if(!r){alert('Calcule primeiro.');return;}
+  const ticker=($('rc-ticker')?.value||$('qm-ticker')?.value||'').toUpperCase().trim();
+  analyses.unshift({
+    id:Date.now(), method, label:r.label,
+    ticker:ticker||'—', price:r.price, result:r.teto,
+    ms:r.price?(r.teto-r.price)/r.price*100:null,
+    date:new Date().toLocaleString('pt-BR')
+  });
+  if(analyses.length>60) analyses=analyses.slice(0,60);
+  localStorage.setItem('vp_analyses',JSON.stringify(analyses));
+  updateBadge();
+  const btn=event.target;
+  const orig=btn.textContent;
+  btn.textContent='✅ Salvo!';
+  setTimeout(()=>btn.textContent=orig,2000);
+}
+
+function clearAll(){
+  if(!confirm('Limpar todo o histórico?')) return;
+  analyses=[];
+  localStorage.removeItem('vp_analyses');
+  updateBadge();
+  renderHistory();
+}
+
+function updateBadge(){
+  $('save-badge').textContent=analyses.length+' análise'+(analyses.length!==1?'s':'');
+}
+
+function renderHistory(){
+  const grid=$('hist-grid');
+  if(!analyses.length){
+    grid.innerHTML='<div class="empty-state"><span class="icon">📊</span>Nenhuma análise salva ainda.<br>Vá em Calculadoras, calcule e salve.</div>';
+    return;
+  }
+  grid.innerHTML=analyses.map(a=>{
+    const msColor=a.ms!=null?(a.ms>0?'var(--green)':'var(--red)'):'var(--muted)';
+    const msStr=a.ms!=null?fmtP(a.ms):'—';
+    return `<div class="hcard">
+      <div class="hcard-top"><div class="hcard-ticker">${a.ticker}</div><div class="hcard-method">${a.label}</div></div>
+      <div class="hcard-result">${fmtR(a.result)}</div>
+      ${a.price?`<div style="font-size:11px;color:var(--muted2);margin-top:4px">Cotação: ${fmtR(a.price)}</div>`:''}
+      ${a.ms!=null?`<div class="hcard-margin" style="color:${msColor}">Margem: ${msStr}</div>`:''}
+      <div class="hcard-date">${a.date}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// QUOTE FETCH — com proxy CORS para funcionar offline/local
+// ══════════════════════════════════════════════════════
+
+// Tenta buscar via múltiplos proxies para contornar CORS
+async function fetchWithProxy(yahooUrl) {
+  // Proxy 1: allorigins (mais confiável)
+  const proxies = [
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+    u => `https://cors-anywhere.herokuapp.com/${u}`,
+  ];
+  for (const makeUrl of proxies) {
+    try {
+      const res = await fetch(makeUrl(yahooUrl), { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) continue;
+      const text = await res.text();
+      // allorigins às vezes retorna JSON embrulhado
+      try { return JSON.parse(text); } catch { continue; }
+    } catch (e) { continue; }
+  }
+  throw new Error('Todos os proxies falharam');
+}
+
+// Fallback: BRAPI (API brasileira gratuita, sem CORS)
+async function fetchBrapi(ticker) {
+  // Remove .SA se vier com sufixo
+  const sym = ticker.replace(/\.SA$/i, '');
+  const url = `https://brapi.dev/api/quote/${sym}?token=demo`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+  if (!res.ok) throw new Error('brapi falhou');
+  const data = await res.json();
+  const r = data?.results?.[0];
+  if (!r || !r.regularMarketPrice) throw new Error('sem dados');
+  return {
+    price: r.regularMarketPrice,
+    chg:   r.regularMarketChangePercent || 0,
+    low52: r.fiftyTwoWeekLow,
+    high52:r.fiftyTwoWeekHigh,
+    symbol:r.symbol,
+  };
+}
+
+function applyQuoteToUI(src, info) {
+  const { price, chg, low52, high52, symbol } = info;
+  // Preenche todos os campos de cotação
+  document.querySelectorAll('input[id$="-price"]').forEach(el => {
+    el.value = price.toFixed(2);
+  });
+  if (src === 'rc') {
+    $('rc-sym').textContent = symbol;
+    $('rc-metrics').innerHTML = [
+      { k: 'Cotação', v: 'R$ ' + price.toFixed(2), c: '' },
+      { k: 'Variação', v: fmtP(chg), c: chg >= 0 ? 'up' : 'dn' },
+      { k: 'Mín 52s',  v: low52  ? 'R$ ' + low52.toFixed(2)  : '—', c: '' },
+      { k: 'Máx 52s',  v: high52 ? 'R$ ' + high52.toFixed(2) : '—', c: '' },
+    ].map(m => `<div class="metric-item"><span class="mk">${m.k}</span><span class="mv ${m.c}">${m.v}</span></div>`).join('');
+    $('rc-quote').style.display = 'block';
+  } else {
+    $('qm-metrics').innerHTML = [
+      { l: 'Cotação', v: 'R$ ' + price.toFixed(2), c: 'neu' },
+      { l: 'Variação', v: fmtP(chg), c: chg >= 0 ? 'up' : 'dn' },
+      { l: 'Mín 52s',  v: low52  ? 'R$ ' + low52.toFixed(2)  : '—', c: '' },
+      { l: 'Máx 52s',  v: high52 ? 'R$ ' + high52.toFixed(2) : '—', c: '' },
+    ].map(c => `<div class="qm-chip"><span class="qm-chip-label">${c.l}</span><span class="qm-chip-val ${c.c}">${c.v}</span></div>`).join('');
+    $('qm-metrics').style.display = 'flex';
+  }
+}
+
+async function fetchQuote(src) {
+  const tickerInput = src === 'qm' ? $('qm-ticker') : $('rc-ticker');
+  const btn         = src === 'qm' ? $('qm-btn')    : $('rc-btn');
+  const raw = (tickerInput.value || '').trim().toUpperCase();
+  if (!raw) return;
+  const sym    = raw.replace(/\.SA$/i, '');
+  const ticker = sym + '.SA';
+  const origTxt = btn.textContent;
+  btn.textContent = '⏳';
+  btn.disabled = true;
+
+  try {
+    // Tenta BRAPI primeiro (sem CORS, ideal para arquivo local)
+    try {
+      const info = await fetchBrapi(sym);
+      applyQuoteToUI(src, info);
+      btn.textContent = origTxt;
+      btn.disabled = false;
+      return;
+    } catch (_) { /* tenta Yahoo via proxy */ }
+
+    // Fallback: Yahoo Finance via proxy CORS
+    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+    const data = await fetchWithProxy(yahooUrl);
+    const q = data?.chart?.result?.[0];
+    if (!q) throw new Error('sem resultado');
+    const meta  = q.meta;
+    const price = meta.regularMarketPrice;
+    const prev  = meta.chartPreviousClose || meta.regularMarketPreviousClose || price;
+    applyQuoteToUI(src, {
+      price,
+      chg:   prev ? (price - prev) / prev * 100 : 0,
+      low52: meta.fiftyTwoWeekLow,
+      high52:meta.fiftyTwoWeekHigh,
+      symbol:meta.symbol || ticker,
+    });
+  } catch (e) {
+    // Mostra mensagem mais clara e campo manual como alternativa
+    const msg = `⚠️ Não foi possível buscar a cotação automaticamente.\n\nIsso acontece quando o arquivo está salvo localmente (sem servidor).\n\nSoluções:\n1. Use o campo de cotação manualmente nos formulários\n2. Hospede o arquivo em um servidor (ex: Railway, Netlify)\n3. Tente digitar apenas o código sem .SA (ex: PETR4)`;
+    alert(msg);
+  }
+  btn.textContent = origTxt;
+  btn.disabled = false;
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+updateBadge();
+</script>
+</body>
+</html>
